@@ -154,5 +154,6 @@ File.open(html_file, 'w') do |f|
   f.write(result)
 end
 
+puts "Your comprehensive quality control file is ready in the current directory #{File.join(Dir.pwd,'index.html')}"
 
 
