@@ -56,7 +56,7 @@ Then open index.html in your browser
 ## TODO
 
 * avoid user to specify -a and -b. By default discover zip files and ordering them define the first and second strand.
-* package everything as a gem
+* ~~package everything as a gem~~
 * provide better documentation for installing the gem on multiple system (GNU/Linux, OSX, Windows)
 
 
