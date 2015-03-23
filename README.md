@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/helios/bioruby-gfastqc.png)](http://travis-ci.org/helios/bioruby-gfastqc)
 
-Full description goes here
+Bioinformatics. Aggregate FastQC (quality control for Next Generation Sequencing -NGS-) results from many different samples in a single web page, with charts and tables organized and simplified. The main goal is to speed up the communication process with colleagues (PIs, Biologists, BioInformaticians).
 
 Note: this software is under active development!
 
@@ -43,11 +43,11 @@ it contents is for example:
 
 then run the script in the directory of the `config.yml` file and specify the sub directory for each sampel where is located the result of the FASTQC
 
-    ruby gfastqc.rb -a R1 -b R2
+    gfastqc -a R1 -b R2
 
 in case you have the results of FastQC in a sub folder and you want to keep the definition of the sample independen from it, you can use the step option
 
-    ruby gfastqc.rb -a R1 -b R2 --step qc_pre_trimming
+    gfastqc -a R1 -b R2 --step qc_pre_trimming
 
 Then open index.html in your browser
 
