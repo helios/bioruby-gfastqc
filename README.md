@@ -20,6 +20,8 @@ require 'bio-gfastqc'
 
 The API doc is online. For more code examples see the test files in
 the source tree.
+
+Note: at this time there is not a real API, it will follow.
         
 ## Project home page
 
