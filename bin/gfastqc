@@ -54,6 +54,12 @@ class OptHandlingBox
         options.config = config
       end
 
+      opts.on('-p', '--pipengine',
+              'if you used pipengine to produce the fastqc result is better to use this option. gfastqc will look into the output directory specified in the sample.yml') do
+        options.pipengine = true
+      end
+
+
       opts.on('-s', '--step [STEP]',
               'choose the step from which extract the fastqc data') do |step|
         options.step = step
@@ -95,6 +101,11 @@ config = YAML.load_file(options.config)
 @base_file_names << options.first #this must be mandatory
 @base_file_names << options.second if options.second # this can be optional
 
+if options.pipengine 
+  unless config['output']
+    puts "Error: If you selected the compatible option -p/--pipengine, an 'output' tag must occour in your configuration file."
+  end
+end
 
 config['samples'].each_pair do |name, path|
   @data[name] = {}
@@ -102,7 +113,7 @@ config['samples'].each_pair do |name, path|
   @base_file_names.each do |base_file_name|
     @data[name][base_file_name]={}
     @tables[name][base_file_name]={}
-    file = File.join(path, options.step, "#{base_file_name}_fastqc.zip")
+    file = File.join(options.pipengine ? File.join(config['output'], name) : path, options.step, "#{base_file_name}_fastqc.zip")
     Zip::File.open(file) do |zip_file|
       zip_file.glob('*/Images/*.png').each do |entry|
         @data[name][base_file_name][File.basename(entry.name,".png")]=Base64.encode64(entry.get_input_stream.read)

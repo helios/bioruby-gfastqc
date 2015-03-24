@@ -53,10 +53,23 @@ in case you have the results of FastQC in a sub folder and you want to keep the 
 
 Then open index.html in your browser
 
+### Pipengine
+Pipengine, https://github.com/fstrozzi/bioruby-pipengine, a simple launcher for complex biological pipelines. Because we are developing it we found usefult to reuse some best practices from it. An example is the `-s/--step` options which let you select the sample inner directory from which grab the FastQC results. In the current examples we defined just samples and their absolut path, but following the Pipengine directives it is necessary to define another tag:
+
+    output: /path/where_the_pipe_engine_data_are_processed_and_saved
+
+to reuse that tag from gfastqc the user can simply select the option
+
+    -p/--pipengine
+
+the software will look for the results of single fastqc applied to the different samples in the `output` directory.
+
 
 
 ## TODO
 
+* ~~read output tag from sample config file (YAML)~~
+* ~~add reference to pipengine~~
 * avoid user to specify -a and -b. By default discover zip files and ordering them define the first and second strand.
 * ~~package everything as a gem~~
 * provide better documentation for installing the gem on multiple system (GNU/Linux, OSX, Windows)
