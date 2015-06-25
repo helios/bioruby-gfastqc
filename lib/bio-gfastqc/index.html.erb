@@ -39,7 +39,7 @@
       <div role="tabpanel" class="tab-pane" id="summaries">
       <!-- Summaries Start-->
 
-                <table id="provara" class="display" cellspacing="0" width="100%">
+                <table id="summy" class="display" cellspacing="0" width="100%">
                   <thead>
                     <tr>
                     <% (["source"]+@type_tables).each do |col_name| %>
@@ -157,7 +157,7 @@
 </body>
 <script type="text/javascript">
 $(document).ready(function() {
-$("#provara").DataTable();
+$("#summy").DataTable();
 <% @type_tables.each do |type| %>
   <% @tables.each_pair do |sample_name, reads| %>
     <% reads.each_pair do |reads_name, tables| %>                    
