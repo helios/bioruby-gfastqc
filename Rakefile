@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "bio-gfastqc"
   gem.homepage = "http://github.com/helios/bioruby-gfastqc"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Aggregate FastQC (quality control for Next Generation Sequencing -NGS-)}
+  gem.description = %Q{Bioinformatics. Aggregate FastQC (quality control for Next Generation Sequencing -NGS-) results from many different samples in a single web page, with charts and tables organized and simplified. The main goal is to speed up the communication process with colleagues (PIs, Biologists, BioInformaticians).}
   gem.email = "ilpuccio.febo@gmail.com"
   gem.authors = ["Raoul Jean Pierre Bonnal"]
   # dependencies defined in Gemfile
