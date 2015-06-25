@@ -31,10 +31,41 @@
 
         <div role="tabpanel">
           <ul class="nav nav-tabs" role="tablist" >
+              <li role="presentation"><a href="#summaries" aria-controls="summaries" role="tab" data-toggle="tab">Summaries</a></li>
               <li role="presentation"><a href="#charts" aria-controls="charts" role="tab" data-toggle="tab">Charts</a></li>
               <li role="presentation"><a href="#tables" aria-controls="tables" role="tab" data-toggle="tab">Tables</a></li>
           </ul>
           <div class="tab-content">
+      <div role="tabpanel" class="tab-pane" id="summaries">
+      <!-- Summaries Start-->
+
+                <table id="provara" class="display" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                    <% (["source"]+@type_tables).each do |col_name| %>
+                      <th><%= col_name %></th>
+                    <% end %>  
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <% @tables.each_pair do |sample_name, reads| %>
+                    <tr>
+                      <td><%= sample_name %></td>
+                      <% @type_tables.each do |col_name| %>
+                        <td>
+                          <% reads.each_pair do |reads_name, tables| %>
+                            <%= tables[col_name]["status"]=="fail" ? reads_name : "" %>
+                          <% end %>
+                        </td>
+                      <% end %>
+                    </tr>
+                  <% end %>
+                  </tbody>
+                </table>
+
+      <!-- Summaries End-->  
+      </div>
+
 
             <div role="tabpanel" class="tab-pane" id="charts">
       <!-- Charts Start-->
@@ -110,7 +141,7 @@
           <% end %>
           </div>
         </div>
-      <!-- Charts End-->  
+      <!-- Tables End-->  
             </div>
 
 
@@ -126,13 +157,16 @@
 </body>
 <script type="text/javascript">
 $(document).ready(function() {
+$("#provara").DataTable();
 <% @type_tables.each do |type| %>
   <% @tables.each_pair do |sample_name, reads| %>
     <% reads.each_pair do |reads_name, tables| %>                    
-      $("#<%= type %>_<%= sample_name %>_<%= reads_name %>_table").DataTable();
+      $("#"+"<%= type %>_<%= sample_name %>_<%= reads_name %>_table").DataTable();
+
     <% end %>
   <% end %>
 <% end %>
+
 } );
 </script>
 
