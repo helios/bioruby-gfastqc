@@ -116,7 +116,8 @@ config['samples'].each_pair do |name, path|
     file = File.join(options.pipengine ? File.join(config['output'], name) : path, options.step, "#{base_file_name}_fastqc.zip")
     Zip::File.open(file) do |zip_file|
       zip_file.glob('*/Images/*.png').each do |entry|
-        @data[name][base_file_name][File.basename(entry.name,".png")]=Base64.encode64(entry.get_input_stream.read)
+        field_name = File.basename(entry.name,".png")
+        @data[name][base_file_name][field_name]=Base64.encode64(entry.get_input_stream.read)
       end #each entry
       zip_file.glob('*/fastqc_data.txt').each do |entry|
         entry.get_input_stream.read.scan(/>>(.*?)>>END_MODULE/m).each do |match|
@@ -128,7 +129,9 @@ config['samples'].each_pair do |name, path|
               data_row.split("\t")
             end
             # puts field_name
-            @tables[name][base_file_name][field_name.tr(" ","_")]={ "status" => status,
+            # puts header
+            field_name = field_name.tr(" ","_")
+            @tables[name][base_file_name][field_name]={ "status" => status,
               "header"=> header,
               "content" => content
             }
