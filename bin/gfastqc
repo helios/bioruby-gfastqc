@@ -59,6 +59,10 @@ class OptHandlingBox
         options.pipengine = true
       end
 
+      opts.on('-g', '--groups',
+              'if you specified groups in your configuration file, select this option') do
+        options.groups = true
+      end
 
       opts.on('-s', '--step [STEP]',
               'choose the step from which extract the fastqc data') do |step|
@@ -73,6 +77,11 @@ class OptHandlingBox
       opts.on('-b', '--second [SECOND]',
               'reverse strand reads') do |second|
         options.second = second
+      end
+
+      opts.on('-n', '--usename',
+              'use sample name to build the path (maybe later implement placeholding like pipengine') do
+        options.usename = true
       end
 
 
@@ -114,51 +123,118 @@ elsif options.pipengine && config['resources'] && config['resources']['output']
 else
   '.'
 end
-    
 
-config['samples'].each_pair do |name, path|
-  @data[name] = {}
-  @tables[name] = {}
-  @base_file_names.each do |base_file_name|
-    @data[name][base_file_name]={}
-    @tables[name][base_file_name]={}
-    file = File.join(options.pipengine ? File.join(output, name) : path, options.step, "#{base_file_name}_fastqc.zip")
-    Zip::File.open(file) do |zip_file|
-      zip_file.glob('*/Images/*.png').each do |entry|
-        field_name = File.basename(entry.name,".png")
-        @data[name][base_file_name][field_name]=Base64.encode64(entry.get_input_stream.read)
-      end #each entry
-      zip_file.glob('*/fastqc_data.txt').each do |entry|
-        entry.get_input_stream.read.scan(/>>(.*?)>>END_MODULE/m).each do |match|
-          match_data = match.first.split("\n")
-          field_name, status = match_data[0].split("\t")
-          begin 
-            header = match_data[1].tr("#","").split("\t")
-            content = match_data[2..-1].map do |data_row|
-              data_row.split("\t")
-            end
-            # puts field_name
-            # puts header
-            field_name = field_name.tr(" ","_")
-            @tables[name][base_file_name][field_name]={ "status" => status,
-              "header"=> header,
-              "content" => content
-            }
-          rescue
-            # $stderr.puts match_data.inspect #This is a generic warning to notify the user that this records has no data associated with.
-          end
 
-        end #match
-      end #fastq data.txt
-    end #zip
-  end #files
-end
+if options.groups
+#both are exact the name only iterate on groups and the other only on samples (without groups)
+  config['samples'].each_pair do |group_name, sample|
+    sample.each_pair do |name, path|
+      @data[name] = {}
+      @tables[name] = {}
+      @base_file_names.each do |base_file_name|
+        @data[name][base_file_name]={}
+        @tables[name][base_file_name]={}
+        filename = options.usename ? "#{name}_#{base_file_name}" : base_file_name
+        file = File.join(options.pipengine ? File.join(output, group_name, name) : path, options.step, "#{filename}_fastqc.zip")
+        Zip::File.open(file) do |zip_file|
+          zip_file.glob('*/Images/*.png').each do |entry|
+            field_name = File.basename(entry.name,".png")
+            @data[name][base_file_name][field_name]=Base64.encode64(entry.get_input_stream.read)
+          end #each entry
+          zip_file.glob('*/fastqc_data.txt').each do |entry|
+            entry.get_input_stream.read.scan(/>>(.*?)>>END_MODULE/m).each do |match|
+              match_data = match.first.split("\n")
+              field_name, status = match_data[0].split("\t")
+              begin 
+              if field_name == "Overrepresented sequences" && status == 'pass'
+                header = []
+                content = []
+              else
+                header = match_data[1].tr("#","").split("\t")
+                content = match_data[2..-1].map do |data_row|
+                  data_row.split("\t")
+                end
+              end
+                # puts field_name
+                # puts header
+                field_name = field_name.tr(" ","_")
+                @tables[name][base_file_name][field_name]={ "status" => status,
+                  "header"=> header,
+                  "content" => content
+                }
+              rescue
+               $stderr.puts match.inspect #This is a generic warning to notify the user that this records has no data associated with.
+               $stderr.puts field_name
+               $stderr.puts status
+              end #begin
+
+            end #match
+          end #fastq data.txt
+        end #zip
+      end #files
+    end #iterate over samples
+  end #iterage over groups
+
+else    
+
+  config['samples'].each_pair do |name, path|
+    @data[name] = {}
+    @tables[name] = {}
+    @base_file_names.each do |base_file_name|
+      @data[name][base_file_name]={}
+      @tables[name][base_file_name]={}
+      filename = options.usename ? "#{name}_#{base_file_name}" : base_file_name
+      file = File.join(options.pipengine ? File.join(output, name) : path, options.step, "#{filename}_fastqc.zip")
+      Zip::File.open(file) do |zip_file|
+        zip_file.glob('*/Images/*.png').each do |entry|
+          field_name = File.basename(entry.name,".png")
+          @data[name][base_file_name][field_name]=Base64.encode64(entry.get_input_stream.read)
+        end #each entry
+        zip_file.glob('*/fastqc_data.txt').each do |entry|
+          entry.get_input_stream.read.scan(/>>(.*?)>>END_MODULE/m).each do |match|
+            # puts match
+            match_data = match.first.split("\n")
+            field_name, status = match_data[0].split("\t")
+            begin 
+              if field_name == "Overrepresented sequences" && status == 'pass'
+                header = []
+                content = []
+              else
+                header = match_data[1].tr("#","").split("\t")
+                content = match_data[2..-1].map do |data_row|
+                  data_row.split("\t")
+                end
+              end
+              # puts field_name
+              # puts header
+              field_name = field_name.tr(" ","_")
+              @tables[name][base_file_name][field_name]={ "status" => status,
+                "header"=> header,
+                "content" => content
+              }
+
+                # if field_name == "Overrepresented_sequences" && status == 'pass'
+                  # puts @tables[name][base_file_name][field_name].inspect
+                # end
+            rescue
+               $stderr.puts match.inspect #This is a generic warning to notify the user that this records has no data associated with.
+               $stderr.puts field_name
+               $stderr.puts status
+            end #begin
+
+          end #match
+        end #fastq data.txt
+      end #zip
+    end #files
+  end #iterate over samples
+end #groups or not
+
 # File.open('test.json','w') do |file|
 #   file.write data.to_json
 # end
 
 @type_images = %w(kmer_profiles per_sequence_gc_content per_base_sequence_content duplication_levels sequence_length_distribution per_sequence_quality per_base_quality adapter_content per_base_n_content per_tile_quality)
-@type_tables = %w(Adapter_Content Basic_Statistics Kmer_Content Per_base_N_content Per_base_sequence_content Per_base_sequence_quality Per_sequence_quality_scores Sequence_Duplication_Levels Sequence_Length_Distribution)
+@type_tables = %w(Adapter_Content Basic_Statistics Kmer_Content Overrepresented_sequences Per_base_N_content Per_base_sequence_content Per_base_sequence_quality Per_sequence_quality_scores Sequence_Duplication_Levels Sequence_Length_Distribution)
 # dropped tables to avoid wast of space or not so informative:
 # Per_sequence_GC_content Overrepresented_sequences Per_tile_sequence_quality 
 # Overrepresented_sequences temporary removed it seems that when this fields pass the test there are no data associated with

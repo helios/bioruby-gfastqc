@@ -54,7 +54,11 @@
                       <% @type_tables.each do |col_name| %>
                         <td>
                           <% reads.each_pair do |reads_name, tables| %>
-                            <%= tables[col_name]["status"]=="fail" ? reads_name : "" %>
+                            <% if tables[col_name]["status"] == 'fail'%>
+                            <%= "f:#{reads_name}" %>
+                            <% elsif tables[col_name]["status"] == "warn" %>
+                            <%= "w:#{reads_name}" %>
+                            <% end %>
                           <% end %>
                         </td>
                       <% end %>
@@ -115,6 +119,7 @@
               <div class="row">
                 <% @tables.each_pair do |sample_name, reads| %>
                   <% reads.each_pair do |reads_name, tables| %>
+                  <% unless tables[type]['header'].empty? %>
                     <h3><%= sample_name + "_" + reads_name %></h3>
                     <table id="<%= type %>_<%= sample_name %>_<%= reads_name %>_table" class="display" cellspacing="0" width="100%">
                       <thead>
@@ -134,6 +139,9 @@
                       <% end %>
                       </tbody>
                     </table>
+                    <% else %>
+                    <h3><%= sample_name + "_" + reads_name %> has no over represented sequences.</h3>
+                    <% end %>
                   <% end %>
                 <% end %>
               </div>             
