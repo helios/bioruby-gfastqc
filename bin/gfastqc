@@ -102,10 +102,19 @@ config = YAML.load_file(options.config)
 @base_file_names << options.second if options.second # this can be optional
 
 if options.pipengine 
-  unless config['output']
+  unless config['resources'] && config['resources']['output']
     puts "Error: If you selected the compatible option -p/--pipengine, an 'output' tag must occour in your configuration file."
   end
 end
+
+output = if config['output']
+  config['output']
+elsif options.pipengine && config['resources'] && config['resources']['output']
+  config['resources']['output']
+else
+  '.'
+end
+    
 
 config['samples'].each_pair do |name, path|
   @data[name] = {}
@@ -113,7 +122,7 @@ config['samples'].each_pair do |name, path|
   @base_file_names.each do |base_file_name|
     @data[name][base_file_name]={}
     @tables[name][base_file_name]={}
-    file = File.join(options.pipengine ? File.join(config['output'], name) : path, options.step, "#{base_file_name}_fastqc.zip")
+    file = File.join(options.pipengine ? File.join(output, name) : path, options.step, "#{base_file_name}_fastqc.zip")
     Zip::File.open(file) do |zip_file|
       zip_file.glob('*/Images/*.png').each do |entry|
         field_name = File.basename(entry.name,".png")
