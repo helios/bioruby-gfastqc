@@ -42,16 +42,16 @@
                 <table id="summy" class="display" cellspacing="0" width="100%">
                   <thead>
                     <tr>
-                    <% (["source"]+@type_tables).each do |col_name| %>
+                    <% (["source"]+@gfastqc.type_tables).each do |col_name| %>
                       <th><%= col_name %></th>
                     <% end %>  
                     </tr>
                   </thead>
                   <tbody>
-                  <% @tables.each_pair do |sample_name, reads| %>
+                  <% @gfastqc.tables.each_pair do |sample_name, reads| %>
                     <tr>
                       <td><%= sample_name %></td>
-                      <% @type_tables.each do |col_name| %>
+                      <% @gfastqc.type_tables.each do |col_name| %>
                         <td>
                           <% reads.each_pair do |reads_name, tables| %>
                             <% if tables[col_name]["status"] == 'fail'%>
@@ -75,15 +75,15 @@
       <!-- Charts Start-->
         <div role="tabpanel">
           <ul class="nav nav-pills" role="tablist" >
-            <% @type_images.each do |type| %>
+            <% @gfastqc.type_images.each do |type| %>
               <li role="presentation"><a href="#<%= type %>" aria-controls="<%= type %>" role="tab" data-toggle="tab"><%= type %></a></li>
             <% end %>
           </ul>
           <div class="tab-content">
-          <% @type_images.each do |type| %>
+          <% @gfastqc.type_images.each do |type| %>
             <div role="tabpanel" class="tab-pane" id="<%= type %>">
               <div class="row">
-                <% @data.each_pair do |sample_name, pairs| %>
+                <% @gfastqc.data.each_pair do |sample_name, pairs| %>
                 <div class="col-xs-6 col-md-6">
                   <div class="caption">
                   <h3><%= sample_name %></h3>
@@ -108,16 +108,16 @@
       <!-- Tables Start-->
         <div role="tabpanel">
           <ul class="nav nav-pills" role="tablist" >
-            <% @type_tables.each do |type| %>
+            <% @gfastqc.type_tables.each do |type| %>
               <li role="presentation"><a href="#<%= type %>_div_table" aria-controls="<%= type %>_div_table" role="tab" data-toggle="tab"><%= type %></a></li>
             <% end %>
           </ul>
           <div class="tab-content">
 
-          <% @type_tables.each do |type| %>
+          <% @gfastqc.type_tables.each do |type| %>
             <div role="tabpanel" class="tab-pane" id="<%= type %>_div_table">
               <div class="row">
-                <% @tables.each_pair do |sample_name, reads| %>
+                <% @gfastqc.tables.each_pair do |sample_name, reads| %>
                   <% reads.each_pair do |reads_name, tables| %>
                   <% unless tables[type]['header'].empty? %>
                     <h3><%= sample_name + "_" + reads_name %></h3>
@@ -166,8 +166,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 $("#summy").DataTable();
-<% @type_tables.each do |type| %>
-  <% @tables.each_pair do |sample_name, reads| %>
+<% @gfastqc.type_tables.each do |type| %>
+  <% @gfastqc.tables.each_pair do |sample_name, reads| %>
     <% reads.each_pair do |reads_name, tables| %>                    
       $("#"+"<%= type %>_<%= sample_name %>_<%= reads_name %>_table").DataTable();
 
